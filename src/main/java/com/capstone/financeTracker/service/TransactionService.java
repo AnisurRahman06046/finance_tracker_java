@@ -1,6 +1,7 @@
 package com.capstone.financeTracker.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.capstone.financeTracker.dto.TransactionRequestDTO;
 import com.capstone.financeTracker.dto.TransactionResponse;
@@ -30,7 +31,8 @@ public class TransactionService {
     //     transaction.setUser(user);
     //     return  transactionRepo.save(transaction);
     // }
-
+ 
+    @Transactional
     public TransactionResponse createTransaction(Long userId, TransactionRequestDTO data){
         if(!data.getType().equals("INCOME") && !data.getType().equals("EXPENSE")){
             throw new RuntimeException("Invalid transaction type");
@@ -46,8 +48,17 @@ public class TransactionService {
         transaction.setDate(data.getDate());
         transaction.setUser(user);
 
-        DailySummary summary = dailySummaryRepo.findByUserAndDate(user,data.getDate())
-            .orElse(new DailySummary(null, 0.0, 0.0, 0.0, data.getDate(), user));
+        DailySummary summary = dailySummaryRepo.findByUserAndDate(user, data.getDate())
+            .orElseGet(() -> {
+                DailySummary newSummary = new DailySummary();
+                newSummary.setUser(user);
+                newSummary.setDate(data.getDate());
+                newSummary.setTotalIncome(0.0);
+                newSummary.setTotalExpense(0.0);
+                newSummary.setBalance(0.0);
+                // Version is handled automatically by Hibernate
+                return newSummary;
+            });
 
         if(data.getType().equals("INCOME")){
             summary.setTotalIncome(summary.getTotalIncome()+data.getAmount());

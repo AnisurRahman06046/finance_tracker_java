@@ -11,6 +11,7 @@ import com.capstone.financeTracker.entity.User;
 
 @Repository
 public interface DailySummaryRepository extends JpaRepository<DailySummary, Long> {
+
     Optional<DailySummary> findByUserAndDate(User user, LocalDate date);
     
 } 
