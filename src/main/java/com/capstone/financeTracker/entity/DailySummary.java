@@ -1,13 +1,13 @@
 package com.capstone.financeTracker.entity;
 
-import java.util.List;
+import java.time.LocalDate;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,23 +15,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users")
+@Table(name="dailySummary")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class User {
+public class DailySummary {
+    
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String email;
+    private Double totalIncome=0.0;
+    private Double totalExpense=0.0;
+    private Double balance = 0.0;
 
+    private LocalDate date;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<DailySummary> dailySummaries;
+    @ManyToOne
+    @JoinColumn(name="userId")
+    private User user;
 }
